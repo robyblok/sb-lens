@@ -4,7 +4,6 @@ namespace StoryblokLens\Commands;
 
 use Dotenv\Dotenv;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Helper\TableSeparator;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -219,7 +218,8 @@ class InspectCommand extends Command
     }
 
 
-    function formatBytes($bytes, $precision = 2) {
+    public function formatBytes($bytes, $precision = 2)
+    {
         $kilobyte = 1024;
         $megabyte = $kilobyte * 1024;
         $gigabyte = $megabyte * 1024;
