@@ -13,6 +13,7 @@ use Symfony\Component\HttpClient\HttpClient;
 class InspectCommand extends Command
 {
     private ?\Symfony\Contracts\HttpClient\HttpClientInterface $clientCdn = null;
+
     private ?\Symfony\Contracts\HttpClient\HttpClientInterface $clientMapi = null;
 
     protected function configure()
@@ -34,6 +35,7 @@ class InspectCommand extends Command
     {
         $dotenv = Dotenv::createImmutable(__DIR__ . '/../..');
         $dotenv->load();
+
         $this->clientCdn = HttpClient::create()
             ->withOptions([
                 'base_uri' => 'https://api.storyblok.com/v2',
@@ -55,7 +57,7 @@ class InspectCommand extends Command
             ]);
     }
 
-    public function execute(InputInterface $input, OutputInterface $output): int
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
 
@@ -75,7 +77,7 @@ class InspectCommand extends Command
         );
 
         // $statusCode = $response->getStatusCode();
-        $io->section("Inspecting Space: {$spaceId}");
+        $io->section('Inspecting Space: ' . $spaceId);
         $content = $response->toArray();
         $resultSpace = [];
 
@@ -85,11 +87,13 @@ class InspectCommand extends Command
                 $rowValue = implode(", ", $value);
                 //$resultSpace[$key] = implode($value);
             }
+
             $resultSpace[] = [
                 $key,
                 $rowValue
             ];
         }
+
         //var_dump($resultSpace);
         /*
         $output->writeln(" Status code: " . $statusCode);
@@ -106,7 +110,7 @@ class InspectCommand extends Command
         // $content = ['id' => 521583, 'name' => 'symfony-docs', ...]
         $response = $this->clientMapi->request(
             'GET',
-            "v1/spaces/{$spaceId}"
+            'v1/spaces/' . $spaceId
         );
         $content = $response->toArray();
         $space = $content["space"];
@@ -131,6 +135,7 @@ class InspectCommand extends Command
         );
 
         $io->section("Limits");
+
         $resultLimits = [];
         foreach ($space['limits'] as $key => $value) {
             $rowValue = $value;
@@ -138,9 +143,11 @@ class InspectCommand extends Command
                 $rowValue = implode(", ", $value);
                 //$resultSpace[$key] = implode($value);
             }
+
             if ($key == "traffic_limit") {
                 $rowValue = $this->formatBytes($rowValue, 0);
             }
+
             $resultLimits[] = [
                 ucwords(str_replace('_', ' ', (string) $key)),
                 $rowValue
@@ -182,7 +189,7 @@ class InspectCommand extends Command
 
         $response = $this->clientMapi->request(
             'GET',
-            "v1/spaces/{$spaceId}/statistics",
+            sprintf('v1/spaces/%s/statistics', $spaceId),
             [
                 'query' => [
                     'version' => 'new'
@@ -227,9 +234,11 @@ class InspectCommand extends Command
         if ($bytes < $kilobyte) {
             return $bytes . ' B';
         }
+
         if ($bytes < $megabyte) {
             return number_format($bytes / $kilobyte, $precision) . ' KB';
         }
+
         if ($bytes < $gigabyte) {
             return number_format($bytes / $megabyte, $precision) . ' MB';
         }
@@ -237,6 +246,7 @@ class InspectCommand extends Command
         if ($bytes < $terabyte) {
             return number_format($bytes / $gigabyte, $precision) . ' GB';
         }
+
         return number_format($bytes / $terabyte, $precision) . ' TB';
     }
 

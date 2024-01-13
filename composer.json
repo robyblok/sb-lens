@@ -22,5 +22,21 @@
     "require-dev": {
         "rector/rector": "^0.19.0",
         "laravel/pint": "^1.13"
+    },
+    "scripts": {
+        "all-fix": [
+            "@cs-fix",
+            "@rector-fix"
+        ],
+        "cs-fix": "pint",
+        "rector-fix": "rector",
+        "rector-preview": "rector --dry-run",
+        "rector-ci": "rector --dry-run --no-progress-bar"
+    },
+    "scripts-descriptions": {
+        "cs-fix": "Fixing the Code Style according to PER standards",
+        "rector-fix": "Fixing the code according to the Rector Rules",
+        "rector-preview": "Showing the suggested changes from Rector",
+        "rector-ci": "Executing Rector in a CI workflow"
     }
 }
