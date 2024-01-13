@@ -12,8 +12,8 @@ use Symfony\Component\HttpClient\HttpClient;
 
 class InspectCommand extends Command
 {
-    private $clientCdn;
-    private $clientMapi;
+    private ?\Symfony\Contracts\HttpClient\HttpClientInterface $clientCdn = null;
+    private ?\Symfony\Contracts\HttpClient\HttpClientInterface $clientMapi = null;
 
     protected function configure()
     {
@@ -30,7 +30,7 @@ class InspectCommand extends Command
             ->setDescription('Inspect some Storyblok space configuration.');
     }
 
-    private function setupClient()
+    private function setupClient(): void
     {
         $dotenv = Dotenv::createImmutable(__DIR__ . '/../..');
         $dotenv->load();
@@ -74,7 +74,7 @@ class InspectCommand extends Command
             ]
         );
 
-        $statusCode = $response->getStatusCode();
+        // $statusCode = $response->getStatusCode();
         $io->section("Inspecting Space: {$spaceId}");
         $content = $response->toArray();
         $resultSpace = [];
@@ -218,24 +218,26 @@ class InspectCommand extends Command
     }
 
 
-    public function formatBytes($bytes, $precision = 2)
+    public function formatBytes(string $bytes, $precision = 2): string
     {
         $kilobyte = 1024;
         $megabyte = $kilobyte * 1024;
         $gigabyte = $megabyte * 1024;
         $terabyte = $gigabyte * 1024;
-
         if ($bytes < $kilobyte) {
             return $bytes . ' B';
-        } elseif ($bytes < $megabyte) {
-            return number_format($bytes / $kilobyte, $precision) . ' KB';
-        } elseif ($bytes < $gigabyte) {
-            return number_format($bytes / $megabyte, $precision) . ' MB';
-        } elseif ($bytes < $terabyte) {
-            return number_format($bytes / $gigabyte, $precision) . ' GB';
-        } else {
-            return number_format($bytes / $terabyte, $precision) . ' TB';
         }
+        if ($bytes < $megabyte) {
+            return number_format($bytes / $kilobyte, $precision) . ' KB';
+        }
+        if ($bytes < $gigabyte) {
+            return number_format($bytes / $megabyte, $precision) . ' MB';
+        }
+
+        if ($bytes < $terabyte) {
+            return number_format($bytes / $gigabyte, $precision) . ' GB';
+        }
+        return number_format($bytes / $terabyte, $precision) . ' TB';
     }
 
 }
