@@ -138,7 +138,7 @@ class InspectCommand extends Command
                 $rowValue = implode(", ", $value);
                 //$resultSpace[$key] = implode($value);
             }
-            if (in_array($key, ["traffic_limit"])) {
+            if ($key == "traffic_limit") {
                 $rowValue = $this->formatBytes($rowValue, 0);
             }
             $resultLimits[] = [
