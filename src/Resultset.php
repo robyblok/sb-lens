@@ -4,6 +4,8 @@ namespace StoryblokLens;
 
 use Symfony\Component\Console\Style\SymfonyStyle;
 
+use function StoryblokLens\{twoColumnList};
+
 class Resultset
 {
     private $result = [];
@@ -63,6 +65,14 @@ class Resultset
         return $this;
     }
 
+    public function addItemResult($label, $value): void
+    {
+        $this->result[] = [
+            $label,
+            $value
+        ];
+    }
+
     public function addByte($field): static
     {
         return $this->add($field, ['self','formatBytes']);
@@ -71,6 +81,11 @@ class Resultset
     public function printResult(SymfonyStyle $io, $column1, $column2): void
     {
         $io->table([$column1, $column2], $this->result);
+    }
+
+    public function viewResult(): void
+    {
+        twoColumnList($this->result);
     }
 
 

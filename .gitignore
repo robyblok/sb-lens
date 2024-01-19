@@ -5,3 +5,4 @@ composer.phar
 .env
 
 /.idea/
+/space_*.json
