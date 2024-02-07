@@ -3,6 +3,13 @@
 namespace StoryblokLens;
 
 use Dotenv\Dotenv;
+use StoryblokLens\Endpoints\Apps;
+use StoryblokLens\Endpoints\Presets;
+use StoryblokLens\Endpoints\Space;
+use StoryblokLens\Endpoints\Statistics;
+use StoryblokLens\Endpoints\Stories;
+use StoryblokLens\Endpoints\Story;
+use StoryblokLens\Endpoints\Workflows;
 use Symfony\Component\HttpClient\HttpClient;
 
 class SbClient
@@ -59,6 +66,41 @@ class SbClient
     public function cdn(): ?\Symfony\Contracts\HttpClient\HttpClientInterface
     {
         return $this->clientCdn;
+    }
+
+    public function story(): Story
+    {
+        return new Story($this->clientMapi);
+    }
+
+    public function space(): Space
+    {
+        return new Space($this->clientMapi);
+    }
+
+    public function apps(): Apps
+    {
+        return new Apps($this->clientMapi);
+    }
+
+    public function statistics(): Statistics
+    {
+        return new Statistics($this->clientMapi);
+    }
+
+    public function presets(): Presets
+    {
+        return new Presets($this->clientMapi);
+    }
+
+    public function workflows(): Workflows
+    {
+        return new Workflows($this->clientMapi);
+    }
+
+    public function stories(): Stories
+    {
+        return new Stories($this->clientMapi);
     }
 
 

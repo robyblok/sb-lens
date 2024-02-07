@@ -10,7 +10,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-use function StoryblokLens\{hint, title, subtitle, twoColumnList};
+use function StoryblokLens\{hint, title, subtitle, twoColumnItem, twoColumnList};
 
 class InspectCommand extends Command
 {
@@ -37,28 +37,12 @@ class InspectCommand extends Command
         title("Storyblok Lens");
 
         $client = SbClient::make();
-        /*
-        $response = $this->clientCdn->request(
-            'GET',
-            'v2/cdn/spaces/me',
-            [
-                'query' => [
-                    'token' => $_ENV["STORYBLOK_ACCESS_TOKEN"]
-                ],
-            ]
-        );
-        $content = $response->toArray();
-        */
 
 
-        $response = $client->mapi()->request(
-            'GET',
-            'v1/spaces/' . $spaceId
-        );
-        $content = $response->toArray();
+        $content = $client->space()->spaceId($spaceId)->get();
         file_put_contents(
             "./space_" . $spaceId . ".json",
-            json_encode($response->toArray(), JSON_PRETTY_PRINT)
+            json_encode($content, JSON_PRETTY_PRINT)
         );
         $space = $content["space"];
         subtitle('Inspecting Space (' . $spaceId . '): ' . $space["name"]);
@@ -81,31 +65,15 @@ class InspectCommand extends Command
         twoColumnList($space["options"]["languages"], ["code", "name"]);
         subtitle("Roles");
         twoColumnList($space["space_roles"], ["role", "id"]);
-        $response = $client->mapi()->request(
-            'GET',
-            "v1/apps/",
-            [
-                'query' => [
-                    'space_id' => $spaceId,
-                    'type' => 'installed'
-                ],
-            ]
-        );
-        $content = $response->toArray();
+        $apps = $client->apps()->spaceId($spaceId)->get();
         subtitle("Applications");
-        twoColumnList($content["apps"], ["name", "intro"]);
+        twoColumnList($apps["apps"], ["name", "intro"]);
 
-        $response = $client->mapi()->request(
-            'GET',
-            sprintf('v1/spaces/%s/statistics', $spaceId),
-            [
-                'query' => [
-                    'version' => 'new'
-                ],
-            ]
-        );
-        $content = $response->toArray();
-        $resultSpace->reset($content);
+        $statistics = $client
+            ->statistics()
+            ->spaceId($spaceId)
+            ->get();
+        $resultSpace->reset($statistics);
         $resultSpace->add("collaborators_count");
         $resultSpace->add("all_stories_count");
         $resultSpace->add("all_assets_count");
@@ -114,18 +82,77 @@ class InspectCommand extends Command
         $resultSpace->viewResult();
 
 
-        $response = $client->mapi()->request(
-            'GET',
-            sprintf('v1/spaces/%s/presets', $spaceId)
-        );
-        $content = $response->toArray();
-        $resultPresets = Resultset::make($content);
-        $resultPresets->addItemResult("Presets count", count($content["presets"]));
-        //var_dump($response->getHeaders());
-        //die();
-        //$resultPresets->addItemResult("Presets count", $response->getHeaders()["total"]);
+        $presets = $client
+            ->presets()
+            ->spaceId($spaceId)
+            ->get();
+        $resultPresets = Resultset::make($presets);
+        $resultPresets->addItemResult("Presets count", count($presets["presets"]));
         subtitle("Presets");
         $resultPresets->viewResult();
+
+
+        $response =  $client->cdn()->request(
+            'GET',
+            'v2/cdn/stories',
+            [
+                'query' => [
+                    'token' => $_ENV["STORYBLOK_ACCESS_TOKEN"],
+                    'level' => 1,
+                    'version' => 'draft'
+                ],
+            ]
+        );
+        $content = $response->toArray();
+        subtitle("Stories for space id " . $spaceId);
+        twoColumnList($content["stories"], ["id", "name"]);
+
+        $workflows = $client
+            ->workflows()
+            ->spaceId($spaceId)
+            ->get();
+
+        $workflows = $workflows["workflows"];
+
+        $availableWorkflows = [];
+        subtitle("Workflows, found " . count($workflows) . " workflows");
+        foreach ($workflows as $workflow) {
+            $defaultString = $workflow["is_default"] ? " - [DEFAULT]" : "";
+            subtitle(
+                subtitle: "Workflow  : " . $workflow["name"] . $defaultString,
+                colorLevel: "300",
+                padding: "3",
+                margin: "3",
+                textColor: "gray-900"
+            );
+            foreach($workflow["workflow_stages"] as $stage) {
+                $allowReport = [];
+                $availableWorkflows[$stage["id"]] = $stage["name"];
+                foreach (["allow_all_stages", "allow_all_users", "allow_publish"] as $allow) {
+                    if ($stage[$allow]) {
+                        $allowReport[] = Resultset::unslugifyString($allow);
+                    }
+                }
+
+                twoColumnItem($stage["name"], implode(", ", $allowReport));
+            }
+        }
+
+        $stories = $client
+            ->stories()
+            ->spaceId($spaceId)
+            ->get();
+        subtitle("Stories without workflow for space id: " . $spaceId);
+        //var_dump($response->getHeaders()["total"][0]);
+        foreach ($stories["stories"] as $item) {
+            $prefix = $item["is_folder"] ? "F" : "S";
+            $stage = is_null($item["stage"]) ? "NO STAGE WORKFLOW" : $availableWorkflows[$item["stage"]["workflow_stage_id"]];
+
+            twoColumnItem($prefix . " - " . $stage . "  - " . $item["name"], $item["full_slug"]);
+
+
+        }
+
         if (count($space["space_roles"]) === 0) {
             hint(
                 "Enhance user control and security by configuring roles! Roles allow you to create groups of users with specific permissions and responsibilities. For instance, you can define a 'Content Reviewer' role, granting the ability to read and save content without the power to publish. Take charge of your user management today for a more tailored and secure experience.",
@@ -139,6 +166,7 @@ class InspectCommand extends Command
                 "You can configure the languages here: https://app.storyblok.com/#/me/spaces/" . $spaceId . "/settings?tab=internationalization"
             );
         }
+
 
         return Command::SUCCESS;
     }

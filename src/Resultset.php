@@ -43,7 +43,7 @@ class Resultset
         }
 
         $this->result[] = [
-            ucwords(str_replace('_', ' ', (string) $field)),
+            self::unslugifyString($field),
             $value //$this->data[$field]
         ];
         $this->keyList[] = $field;
@@ -55,7 +55,7 @@ class Resultset
         foreach ($this->data as $key => $value) {
             if (! in_array($key, $this->keyList)) {
                 $this->result[] = [
-                    ucwords(str_replace('_', ' ', (string) $key)),
+                    self::unslugifyString($key),
                     $value
                 ];
                 $this->keyList[] = $key;
@@ -113,6 +113,11 @@ class Resultset
         }
 
         return number_format($bytes / $terabyte, $precision) . ' TB';
+    }
+
+    public static function unslugifyString($string): string
+    {
+        return ucwords(str_replace('_', ' ', (string) $string));
     }
 
     public function printTable($data, $io, $fieldList, $columnName = []): void

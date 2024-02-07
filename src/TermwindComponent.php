@@ -16,17 +16,27 @@ function title($title, $subtitle = ""): void
 HTML);
 }
 
-function subtitle($subtitle): void
+function subtitle($subtitle, $color = "blue", $colorLevel = "600", $padding = "1", $margin = 0, $textColor = "white"): void
 {
     render(<<<HTML
     <div> 
-        <div class="px-1 bg-blue-600">{$subtitle}</div>
+        <div class="text-{$textColor} ml-{$margin} px-{$padding} bg-{$color}-{$colorLevel}">{$subtitle}</div>
     </div>
 HTML);
 }
 
 function twoColumnList($list, $column = [0, 1]): void
 {
+    if (is_null($list)) {
+        render(<<<HTML
+    <div> 
+        <div class="ml-2 px-1 bg-yellow-600">No data</div>
+    </div>
+HTML);
+
+        return;
+    }
+
     foreach ($list as $item) {
         twoColumnItem($item[$column[0]], $item[$column[1]]);
     }
