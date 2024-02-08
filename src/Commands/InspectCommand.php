@@ -10,6 +10,9 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
+use Symfony\Component\Process\Exception\ProcessFailedException;
+use Symfony\Component\Process\Process;
+
 use function StoryblokLens\{hint, title, subtitle, twoColumnItem, twoColumnList};
 
 class InspectCommand extends Command
@@ -26,6 +29,19 @@ class InspectCommand extends Command
                 'The Space ID',
                 ''
             )
+            ->addOption(
+                'url',
+                'u',
+                InputOption::VALUE_OPTIONAL,
+                'URL to analyze (example https://www.storyblok.com/)',
+                ''
+            )
+            ->addOption(
+                'skip-url',
+                null,
+                InputOption::VALUE_NONE,
+                'Skip the HTTP URL analysis'
+            )
             ->setDescription('Inspect some Storyblok space configuration.');
     }
 
@@ -33,6 +49,8 @@ class InspectCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $spaceId = $input->getOption("space");
+        $urlToAnalyze = $input->getOption("url");
+        $skipUrl = $input->getOption("skip-url");
 
         title("Storyblok Lens");
 
@@ -80,8 +98,70 @@ class InspectCommand extends Command
         $resultSpace->add("all_components_count");
         subtitle("Metrics");
         $resultSpace->viewResult();
+        //print_r($statistics["api_logs"]);
+        subtitle("Monthly traffic");
+        foreach ($statistics["monthly_traffic"] as $statistic) {
+            $string = "(" . $statistic["counting"] . " reqs.) " .
+                Resultset::formatBytes($statistic["total_bytes"]);
+            twoColumnItem($statistic["month_col"], $string);
+
+        }
+
+        /*
+        subtitle("API calls, last week");
+        foreach ($statistics["monthly_traffic"] as $statistic) {
+            $string = "(" . $statistic["created_at"] . " reqs.) " .
+                Resultset::formatBytes($statistic["total_bytes"]);
+            twoColumnItem($statistic["month_col"], $string);
+
+        }
+        */
 
 
+        $components = $client
+            ->components()
+            ->spaceId($spaceId)
+            ->get();
+        //print_r($statistics["api_logs"]);
+        subtitle("Components");
+        $numContentTypes = 0;
+        $numNestable = 0;
+        $numUniversal = 0;
+        $numWithPreset = 0;
+        foreach ($components["components"] as $component) {
+            $string = "";
+            if ($component["is_root"] && $component["is_nestable"]) {
+                $string = "Universal Block";
+                ++$numUniversal;
+            } else {
+                if ($component["is_root"]) {
+                    $string = "Content Type";
+                    ++$numContentTypes;
+                }
+
+                if ($component["is_nestable"]) {
+                    $string = "Nestable";
+                    ++$numNestable;
+                }
+            }
+
+            if ($string == "") {
+                $string = "Nestable";
+                ++$numNestable;
+            }
+
+            $string = $string . " with " . count($component["all_presets"]) . " presets";
+            if (count($component["all_presets"]) > 0) {
+                ++$numWithPreset;
+            }
+
+            //twoColumnItem($component["name"], $string);
+        }
+
+        twoColumnItem("Content Types", $numContentTypes);
+        twoColumnItem("Universal", $numUniversal);
+        twoColumnItem("Nested Block", $numNestable);
+        twoColumnItem("Component with presets", $numWithPreset);
         $presets = $client
             ->presets()
             ->spaceId($spaceId)
@@ -91,21 +171,13 @@ class InspectCommand extends Command
         subtitle("Presets");
         $resultPresets->viewResult();
 
-
-        $response =  $client->cdn()->request(
-            'GET',
-            'v2/cdn/stories',
-            [
-                'query' => [
-                    'token' => $_ENV["STORYBLOK_ACCESS_TOKEN"],
-                    'level' => 1,
-                    'version' => 'draft'
-                ],
-            ]
-        );
-        $content = $response->toArray();
+        /*
+        $cdnStories = $client
+            ->cdnStories()
+            ->get();
         subtitle("Stories for space id " . $spaceId);
-        twoColumnList($content["stories"], ["id", "name"]);
+        twoColumnList($cdnStories["stories"], ["id", "name"]);
+        */
 
         $workflows = $client
             ->workflows()
@@ -148,7 +220,7 @@ class InspectCommand extends Command
             $prefix = $item["is_folder"] ? "F" : "S";
             $stage = is_null($item["stage"]) ? "NO STAGE WORKFLOW" : $availableWorkflows[$item["stage"]["workflow_stage_id"]];
 
-            twoColumnItem($prefix . " - " . $stage . "  - " . $item["name"], $item["full_slug"]);
+            //twoColumnItem($prefix . " - " . $stage . "  - " . $item["name"], $item["full_slug"]);
 
 
         }
@@ -167,6 +239,42 @@ class InspectCommand extends Command
             );
         }
 
+        if (! $skipUrl) {
+            if ($urlToAnalyze !== "") {
+                $process = new Process(['bun',
+                    'run',
+                    './node_modules/lighthouse/cli/index.js',
+                    $urlToAnalyze,
+                    '--output=html,json',
+                    '--quiet',
+                    '--chrome-flags="--headless"',
+                    '--output-path=./sb'
+                ]);
+                $process->run();
+
+                if (!$process->isSuccessful()) {
+                    throw new ProcessFailedException($process);
+                }
+
+                echo $process->getOutput();
+
+            }
+
+            $json = file_get_contents('sb.report.json');
+            $json_data = json_decode($json, true);
+            foreach ($json_data["audits"] as $audit) {
+                if ($audit["score"] < 0.7 && $audit["score"] != "") {
+                    hint(
+                        $audit["title"],
+                        //""
+                        $audit["description"]
+                    );
+                    //print_r($audit);
+                }
+
+            }
+
+        }
 
         return Command::SUCCESS;
     }

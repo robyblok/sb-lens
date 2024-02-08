@@ -1,6 +1,11 @@
 ##### Composer
 composer.phar
 /vendor/
+/node_modules/
+
+/*.report.html
+/*.report.json
+
 
 .env
 
