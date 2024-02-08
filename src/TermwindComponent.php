@@ -24,6 +24,16 @@ function subtitle($subtitle, $color = "blue", $colorLevel = "600", $padding = "1
     </div>
 HTML);
 }
+function hr(): void
+{
+    render(<<<HTML
+    <div> 
+        <hr>
+    </div>
+HTML);
+}
+
+
 
 function twoColumnList($list, $column = [0, 1]): void
 {

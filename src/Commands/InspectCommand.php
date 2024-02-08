@@ -13,7 +13,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Process;
 
-use function StoryblokLens\{hint, title, subtitle, twoColumnItem, twoColumnList};
+use function StoryblokLens\{hint, title, subtitle, hr,  twoColumnItem, twoColumnList};
 
 class InspectCommand extends Command
 {
@@ -240,6 +240,9 @@ class InspectCommand extends Command
         }
 
         if (! $skipUrl) {
+            hr();
+            title("URL Analysis");
+
             if ($urlToAnalyze !== "") {
                 $process = new Process(['bun',
                     'run',
@@ -262,6 +265,8 @@ class InspectCommand extends Command
 
             $json = file_get_contents('sb.report.json');
             $json_data = json_decode($json, true);
+
+            subtitle($json_data["mainDocumentUrl"]);
             foreach ($json_data["audits"] as $audit) {
                 if ($audit["score"] < 0.7 && $audit["score"] != "") {
                     hint(
