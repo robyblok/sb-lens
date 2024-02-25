@@ -90,8 +90,12 @@ class Resultset
 
 
 
-    public static function formatBytes(string $bytes, $precision = 2): string
+    public static function formatBytes(string|null $bytes, $precision = 2): string
     {
+        if (is_null($bytes)) {
+            $bytes = 0;
+        }
+
         $kilobyte = 1024;
         $megabyte = $kilobyte * 1024;
         $gigabyte = $megabyte * 1024;

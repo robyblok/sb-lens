@@ -24,6 +24,7 @@ function subtitle($subtitle, $color = "blue", $colorLevel = "600", $padding = "1
     </div>
 HTML);
 }
+
 function hr(): void
 {
     render(<<<HTML
@@ -78,7 +79,7 @@ function hint($message, $submessage = ""): void
                 <span class="px-2 text-yellow-400 font-bold">
                     {$message}
                 </span>
-                
+
 
             </div>
             <span class="px-2 text-gray-400">
