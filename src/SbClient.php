@@ -9,6 +9,7 @@ use StoryblokLens\Endpoints\Components;
 use StoryblokLens\Endpoints\Presets;
 use StoryblokLens\Endpoints\Space;
 use StoryblokLens\Endpoints\Statistics;
+use StoryblokLens\Endpoints\Traffic;
 use StoryblokLens\Endpoints\Stories;
 use StoryblokLens\Endpoints\Story;
 use StoryblokLens\Endpoints\Workflows;
@@ -88,6 +89,11 @@ class SbClient
     public function statistics(): Statistics
     {
         return new Statistics($this->clientMapi);
+    }
+
+    public function traffic(): Traffic
+    {
+        return new Traffic($this->clientMapi);
     }
 
     public function presets(): Presets

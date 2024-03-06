@@ -107,6 +107,30 @@ class InspectCommand extends Command
 
         }
 
+
+        $traffic = $client
+            ->traffic()
+            ->spaceId($spaceId)
+            ->get();
+        $resultSpace->reset($traffic);
+        $resultSpace->add("montly_traffic_limit", [\StoryblokLens\Resultset::class, "formatBytes"]);
+        $resultSpace->add("traffic_used_this_month", [\StoryblokLens\Resultset::class, "formatBytes"]);
+        $resultSpace->add("traffic_limit", [\StoryblokLens\Resultset::class, "formatBytes"]);
+        $resultSpace->add("total_traffic_per_time_period", [\StoryblokLens\Resultset::class, "formatBytes"]);
+
+        $resultSpace->add("total_requests_per_time_period");
+        $resultSpace->add("total_traffic_per_time_period", [\StoryblokLens\Resultset::class, "formatBytes"]);
+        subtitle("Traffic API");
+        $resultSpace->viewResult();
+        //print_r($statistics["api_logs"]);
+        subtitle("Daily API traffic");
+        foreach ($traffic["traffic"] as $trafficItem) {
+            $string = "(" . $trafficItem["api_requests"] . " reqs.) " .
+                Resultset::formatBytes($trafficItem["total_bytes"]);
+            twoColumnItem($trafficItem["date"], $string);
+
+        }
+
         /*
         subtitle("API calls, last week");
         foreach ($statistics["monthly_traffic"] as $statistic) {
