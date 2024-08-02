@@ -4,6 +4,7 @@ namespace StoryblokLens;
 
 use Dotenv\Dotenv;
 use StoryblokLens\Endpoints\Apps;
+use StoryblokLens\Endpoints\Branches;
 use StoryblokLens\Endpoints\Cdn\CdnStories;
 use StoryblokLens\Endpoints\Components;
 use StoryblokLens\Endpoints\Presets;
@@ -114,6 +115,11 @@ class SbClient
     public function components(): Components
     {
         return new Components($this->clientMapi);
+    }
+
+    public function branches(): Branches
+    {
+        return new Branches($this->clientMapi);
     }
 
     public function cdnStories(): CdnStories

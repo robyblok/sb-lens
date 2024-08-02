@@ -1,8 +1,10 @@
 <?php
 
-namespace StoryblokLens\Termwind;
 
-use function Termwind\render;
+namespace StoryblokLens\Markdown;
+
+use Symfony\Component\Console\Output\OutputInterface;
+
 
 function title($title, $subtitle = ""): void
 {
@@ -13,7 +15,8 @@ function title($title, $subtitle = ""): void
           {$subtitle}
         </em>
     </div>
-HTML);
+HTML
+    );
 }
 
 function subtitle($subtitle, $color = "blue", $colorLevel = "600", $padding = "1", $margin = 0, $textColor = "white"): void
@@ -22,7 +25,8 @@ function subtitle($subtitle, $color = "blue", $colorLevel = "600", $padding = "1
     <div> 
         <div class="text-{$textColor} ml-{$margin} px-{$padding} bg-{$color}-{$colorLevel}">{$subtitle}</div>
     </div>
-HTML);
+HTML
+    );
 }
 
 function hr(): void
@@ -31,9 +35,9 @@ function hr(): void
     <div> 
         <hr>
     </div>
-HTML);
+HTML
+    );
 }
-
 
 
 function twoColumnList($list, $column = [0, 1]): void
@@ -43,7 +47,8 @@ function twoColumnList($list, $column = [0, 1]): void
     <div> 
         <div class="ml-2 px-1 bg-yellow-600">No data</div>
     </div>
-HTML);
+HTML
+        );
 
         return;
     }
@@ -66,7 +71,8 @@ function twoColumnItem($label, $value = ""): void
         {$value}
     </span>
     </div>
-HTML);
+HTML
+    );
 }
 
 function hint($message, $submessage = ""): void
@@ -86,5 +92,6 @@ function hint($message, $submessage = ""): void
                     {$submessage}
                 </span>
         </div>
-HTML);
+HTML
+    );
 }

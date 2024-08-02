@@ -4,11 +4,11 @@ namespace StoryblokLens;
 
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-use function StoryblokLens\{twoColumnList};
+use function StoryblokLens\Termwind\{twoColumnList};
 
 class Resultset
 {
-    private $result = [];
+    private array $result = [];
 
     private array $keyList = [];
 

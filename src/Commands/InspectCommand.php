@@ -13,7 +13,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Process;
 
-use function StoryblokLens\{hint, title, subtitle, hr,  twoColumnItem, twoColumnList};
+use function StoryblokLens\Termwind\{hint, title, subtitle, hr,  twoColumnItem, twoColumnList};
 
 class InspectCommand extends Command
 {
@@ -169,7 +169,7 @@ class InspectCommand extends Command
                 }
             }
 
-            if ($string == "") {
+            if ($string === "") {
                 $string = "Nestable";
                 ++$numNestable;
             }
@@ -268,8 +268,7 @@ class InspectCommand extends Command
             title("URL Analysis");
 
             if ($urlToAnalyze !== "") {
-                $process = new Process(['bun',
-                    'run',
+                $process = new Process(['node',
                     './node_modules/lighthouse/cli/index.js',
                     $urlToAnalyze,
                     '--output=html,json',

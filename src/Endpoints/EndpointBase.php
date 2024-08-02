@@ -2,6 +2,8 @@
 
 namespace StoryblokLens\Endpoints;
 
+use HiFolks\DataType\Block;
+
 abstract class EndpointBase
 {
     protected $spaceId;
@@ -31,8 +33,8 @@ abstract class EndpointBase
 
     }
 
-    public function get(): array
+    public function get(): Block
     {
-        return $this->getResponse()->toArray();
+        return Block::make($this->getResponse()->toArray());
     }
 }
