@@ -19,7 +19,7 @@ abstract class EndpointCdnBase
         return $this->clientCdn->request(
             $this->method(),
             $this->endpoint(),
-            $this->options()
+            $this->options(),
         );
 
     }

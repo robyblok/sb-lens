@@ -27,20 +27,20 @@ class InspectCommand extends Command
                 's',
                 InputOption::VALUE_OPTIONAL,
                 'The Space ID',
-                ''
+                '',
             )
             ->addOption(
                 'url',
                 'u',
                 InputOption::VALUE_OPTIONAL,
                 'URL to analyze (example https://www.storyblok.com/)',
-                ''
+                '',
             )
             ->addOption(
                 'skip-url',
                 null,
                 InputOption::VALUE_NONE,
-                'Skip the HTTP URL analysis'
+                'Skip the HTTP URL analysis',
             )
             ->setDescription('Inspect some Storyblok space configuration.');
     }
@@ -60,7 +60,7 @@ class InspectCommand extends Command
         $content = $client->space()->spaceId($spaceId)->get();
         file_put_contents(
             "./space_" . $spaceId . ".json",
-            json_encode($content, JSON_PRETTY_PRINT)
+            json_encode($content, JSON_PRETTY_PRINT),
         );
         $space = $content["space"];
         subtitle('Inspecting Space (' . $spaceId . '): ' . $space["name"]);
@@ -219,7 +219,7 @@ class InspectCommand extends Command
                 colorLevel: "300",
                 padding: "3",
                 margin: "3",
-                textColor: "gray-900"
+                textColor: "gray-900",
             );
             foreach($workflow["workflow_stages"] as $stage) {
                 $allowReport = [];
@@ -252,14 +252,14 @@ class InspectCommand extends Command
         if (count($space["space_roles"]) === 0) {
             hint(
                 "Enhance user control and security by configuring roles! Roles allow you to create groups of users with specific permissions and responsibilities. For instance, you can define a 'Content Reviewer' role, granting the ability to read and save content without the power to publish. Take charge of your user management today for a more tailored and secure experience.",
-                "You can configure the roles here: https://app.storyblok.com/#/me/spaces/" . $spaceId . "/settings?tab=roles"
+                "You can configure the roles here: https://app.storyblok.com/#/me/spaces/" . $spaceId . "/settings?tab=roles",
             );
         }
 
         if (count($space["options"]["languages"]) === 0) {
             hint(
                 "Don't forget to configure languages for more control! Ensure you've defined language settings to tailor user experiences. Take charge of your user and language configurations for a secure and customized environment.",
-                "You can configure the languages here: https://app.storyblok.com/#/me/spaces/" . $spaceId . "/settings?tab=internationalization"
+                "You can configure the languages here: https://app.storyblok.com/#/me/spaces/" . $spaceId . "/settings?tab=internationalization",
             );
         }
 
@@ -274,7 +274,7 @@ class InspectCommand extends Command
                     '--output=html,json',
                     '--quiet',
                     '--chrome-flags="--headless"',
-                    '--output-path=./sb'
+                    '--output-path=./sb',
                 ]);
                 $process->run();
 
@@ -295,7 +295,7 @@ class InspectCommand extends Command
                     hint(
                         $audit["title"],
                         //""
-                        $audit["description"]
+                        $audit["description"],
                     );
                     //print_r($audit);
                 }

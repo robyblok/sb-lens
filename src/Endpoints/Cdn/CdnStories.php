@@ -20,7 +20,7 @@ class CdnStories extends EndpointCdnBase
             'query' => [
                 'token' => $_ENV["STORYBLOK_ACCESS_TOKEN"],
                 'level' => 1,
-                'version' => 'draft'
+                'version' => 'draft',
             ],
         ];
     }

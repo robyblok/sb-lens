@@ -1,41 +1,40 @@
 <?php
 
-
 namespace StoryblokLens\Markdown;
-
-use Symfony\Component\Console\Output\OutputInterface;
-
 
 function title($title, $subtitle = ""): void
 {
-    render(<<<HTML
+    render(
+        <<<HTML
     <div>
         <div class="px-1 bg-green-600">{$title}</div>
         <em class="ml-1">
           {$subtitle}
         </em>
     </div>
-HTML
+HTML,
     );
 }
 
 function subtitle($subtitle, $color = "blue", $colorLevel = "600", $padding = "1", $margin = 0, $textColor = "white"): void
 {
-    render(<<<HTML
+    render(
+        <<<HTML
     <div> 
         <div class="text-{$textColor} ml-{$margin} px-{$padding} bg-{$color}-{$colorLevel}">{$subtitle}</div>
     </div>
-HTML
+HTML,
     );
 }
 
 function hr(): void
 {
-    render(<<<HTML
+    render(
+        <<<HTML
     <div> 
         <hr>
     </div>
-HTML
+HTML,
     );
 }
 
@@ -43,11 +42,12 @@ HTML
 function twoColumnList($list, $column = [0, 1]): void
 {
     if (is_null($list)) {
-        render(<<<HTML
+        render(
+            <<<HTML
     <div> 
         <div class="ml-2 px-1 bg-yellow-600">No data</div>
     </div>
-HTML
+HTML,
         );
 
         return;
@@ -61,7 +61,8 @@ HTML
 
 function twoColumnItem($label, $value = ""): void
 {
-    render(<<<HTML
+    render(
+        <<<HTML
     <div class="flex mx-2 max-w-150">
     <span>
         {$label}
@@ -71,13 +72,14 @@ function twoColumnItem($label, $value = ""): void
         {$value}
     </span>
     </div>
-HTML
+HTML,
     );
 }
 
 function hint($message, $submessage = ""): void
 {
-    render(<<<HTML
+    render(
+        <<<HTML
         <div class="flex space-x-1">
             <span class="bg-yellow-600 text-white  font-bold">💡 Hint:</span>
             <span class="flex-1  content-repeat-[.] text-gray"></span>
@@ -92,6 +94,6 @@ function hint($message, $submessage = ""): void
                     {$submessage}
                 </span>
         </div>
-HTML
+HTML,
     );
 }

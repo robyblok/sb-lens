@@ -28,7 +28,7 @@ abstract class EndpointBase
         return $this->clientMapi->request(
             $this->method(),
             $this->endpoint(),
-            $this->options()
+            $this->options(),
         );
 
     }

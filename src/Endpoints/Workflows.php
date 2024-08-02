@@ -21,7 +21,7 @@ class Workflows extends EndpointBase
                 //'by_content_type' => "page",
                 'include_stages' => true,
                 'page' => 1,
-                'per_page' => 100
+                'per_page' => 100,
             ],
         ];
     }

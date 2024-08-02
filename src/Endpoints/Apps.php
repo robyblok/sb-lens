@@ -19,7 +19,7 @@ class Apps extends EndpointBase
         return [
             'query' => [
                 'space_id' => $this->spaceId,
-                'type' => 'installed'
+                'type' => 'installed',
             ],
         ];
     }

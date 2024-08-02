@@ -18,7 +18,7 @@ class Statistics extends EndpointBase
     {
         return [
             'query' => [
-                'version' => 'new'
+                'version' => 'new',
             ],
         ];
     }

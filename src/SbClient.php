@@ -46,7 +46,7 @@ class SbClient
                     [
                         'Accept' => 'application/json',
                         'Content-Type' => 'application/json',
-                        'Authorization' => $this->personalAccessToken
+                        'Authorization' => $this->personalAccessToken,
                     ],
             ]);
 

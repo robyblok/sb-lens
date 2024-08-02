@@ -24,7 +24,7 @@ class SbChecker
                     "count" => 1,
                     "workflow_stages_count" => 3,
 
-                ]
+                ],
             ];
     }
 

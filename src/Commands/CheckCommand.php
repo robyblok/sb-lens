@@ -12,11 +12,6 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-
-
-use Symfony\Component\Process\Exception\ProcessFailedException;
-use Symfony\Component\Process\Process;
-
 //use function StoryblokLens\{hint, title, subtitle, hr,  twoColumnItem, twoColumnList};
 
 class CheckCommand extends Command
@@ -31,7 +26,7 @@ class CheckCommand extends Command
                 's',
                 InputOption::VALUE_OPTIONAL,
                 'The Space ID',
-                ''
+                '',
             )
 
             ->setDescription('Check the Storyblok space usage.');
@@ -67,7 +62,7 @@ class CheckCommand extends Command
         $content = $client->space()->spaceId($spaceId)->get();
         file_put_contents(
             "./space_" . $spaceId . ".json",
-            json_encode($content, JSON_PRETTY_PRINT)
+            json_encode($content, JSON_PRETTY_PRINT),
         );
         $space = $content["space"];
         $statistics = $client
@@ -92,7 +87,7 @@ class CheckCommand extends Command
         $r->liLabelValue("API Server Location", $space['region']);
         $r->liLabelValue("Stories", $space['stories_count']);
         $r->liLabelValue("Assets", $space['assets_count']);
-        $r->liLabelValue("Blocks/Components", $components->count("components"));
+        $r->liLabelValue("Blocks/Components", $components->count());
         $r->liLabelValue("Users", $statistics->get("collaborators_count", "N/A"));
         $r->liLabelValue("Max Users", $statistics->get("collaborators_limit", "N/A"));
         $r->newLine();
@@ -103,10 +98,10 @@ class CheckCommand extends Command
         foreach ($statistics["monthly_traffic"] as $statistic) {
             $r->tableRow(
                 [
-                $statistic["month_col"],
-                $statistic["counting"] . " reqs.",
-                Resultset::formatBytes($statistic["total_bytes"])
-                ]
+                    $statistic["month_col"],
+                    $statistic["counting"] . " reqs.",
+                    Resultset::formatBytes($statistic["total_bytes"]),
+                ],
             );
 
         }
@@ -120,8 +115,8 @@ class CheckCommand extends Command
         $hasPipelineApp = false;
         $hasBackupApp = false;
         $hasTaskApp = false;
-        $r->paragraph(sprintf('The Space %s has ', $spaceId) . count($apps["apps"]) . " installed applications." );
-        $r->paragraph("The installed applications are:" );
+        $r->paragraph(sprintf('The Space %s has ', $spaceId) . count($apps["apps"]) . " installed applications.");
+        $r->paragraph("The installed applications are:");
         foreach ($apps["apps"] as $app) {
             if ($app['slug'] === 'backups') {
                 $hasBackupApp = true;

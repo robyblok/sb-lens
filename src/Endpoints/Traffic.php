@@ -20,7 +20,7 @@ class Traffic extends EndpointBase
             'query' => [
                 'start_date' => date('Y-m-d', strtotime('-5 days')),
                 'end_date' => date('Y-m-d'),
-                'group_by' => 'day'
+                'group_by' => 'day',
             ],
         ];
     }

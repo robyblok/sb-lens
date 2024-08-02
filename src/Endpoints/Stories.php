@@ -26,7 +26,7 @@ class Stories extends EndpointBase
             'with_summary' => 1,
 
             'page' => 1,
-            'per_page' => 100
+            'per_page' => 100,
         ];
         if ($this->filterOnlyStories) {
             $query["story_only"] = true;

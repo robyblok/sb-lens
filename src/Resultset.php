@@ -44,7 +44,7 @@ class Resultset
 
         $this->result[] = [
             self::unslugifyString($field),
-            $value //$this->data[$field]
+            $value, //$this->data[$field]
         ];
         $this->keyList[] = $field;
         return $this;
@@ -56,7 +56,7 @@ class Resultset
             if (! in_array($key, $this->keyList)) {
                 $this->result[] = [
                     self::unslugifyString($key),
-                    $value
+                    $value,
                 ];
                 $this->keyList[] = $key;
             }
@@ -69,7 +69,7 @@ class Resultset
     {
         $this->result[] = [
             $label,
-            $value
+            $value,
         ];
     }
 
@@ -144,7 +144,7 @@ class Resultset
 
         $io->table(
             $columnName,
-            $rowList
+            $rowList,
         );
     }
 }

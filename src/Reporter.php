@@ -19,7 +19,7 @@ class Reporter
             " " . $title) . $this->newLine();
     }
 
-    public function paragraph($string): string
+    public function paragraph(string $string): string
     {
         return $this->appendString($string) . $this->newLine();
     }
@@ -50,10 +50,10 @@ class Reporter
 
         $columnRow = implode(" | ", $columnsName);
         return  $this->appendString(
-            sprintf('| %s |', $columnRow)
+            sprintf('| %s |', $columnRow),
         ) .
             $this->appendString(
-                "| " . str_repeat(" --- |", count($columnsName))
+                "| " . str_repeat(" --- |", count($columnsName)),
             );
 
 
@@ -68,7 +68,7 @@ class Reporter
 
         $cellRow = implode(" | ", $cells);
         return  $this->appendString(
-            sprintf('| %s | ', $cellRow)
+            sprintf('| %s | ', $cellRow),
         );
     }
 
