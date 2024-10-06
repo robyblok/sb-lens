@@ -3,13 +3,11 @@
 namespace StoryblokLens\Commands;
 
 use StoryblokLens\Resultset;
-
 use StoryblokLens\SbClient;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Process;
 
@@ -221,7 +219,7 @@ class InspectCommand extends Command
                 margin: "3",
                 textColor: "gray-900",
             );
-            foreach($workflow["workflow_stages"] as $stage) {
+            foreach ($workflow["workflow_stages"] as $stage) {
                 $allowReport = [];
                 $availableWorkflows[$stage["id"]] = $stage["name"];
                 foreach (["allow_all_stages", "allow_all_users", "allow_publish"] as $allow) {

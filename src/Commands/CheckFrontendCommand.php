@@ -3,18 +3,12 @@
 namespace StoryblokLens\Commands;
 
 use HiFolks\DataType\Block;
-use StoryblokLens\Resultset;
-
-use StoryblokLens\SbClient;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Process;
-
-use function StoryblokLens\Termwind\{hint, title, subtitle, hr,  twoColumnItem, twoColumnList};
 
 class CheckFrontendCommand extends Command
 {
@@ -27,9 +21,8 @@ class CheckFrontendCommand extends Command
                 mode: InputOption::VALUE_REQUIRED,
                 description: "URL to analyze (example https://www.storyblok.com/)",
                 suggestedValues: [
-                    "https://www.storyblok.com/"
-                ]
-
+                    "https://www.storyblok.com/",
+                ],
             )
             ->addOption(
                 'skip-check',
@@ -114,8 +107,8 @@ class CheckFrontendCommand extends Command
             $template->render([
                 'urlToAnalyze' => $urlToAnalyze,
                 'data' => $data,
-                'fileNames' => $fileNames
-            ])
+                'fileNames' => $fileNames,
+            ]),
         );
 
 

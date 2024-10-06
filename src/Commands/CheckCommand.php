@@ -2,10 +2,7 @@
 
 namespace StoryblokLens\Commands;
 
-use StoryblokLens\Reporter;
 use StoryblokLens\Resultset;
-
-
 use StoryblokLens\SbClient;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -16,7 +13,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class CheckCommand extends Command
 {
-
     protected function configure()
     {
         $this
@@ -58,18 +54,21 @@ class CheckCommand extends Command
     private function initializeTwig()
     {
         $loader = new \Twig\Loader\FilesystemLoader(__DIR__ . '/../../resources/views');
-        $twig = new \Twig\Environment($loader,
-        /*[
-            'cache' => __DIR__ . '/../../cache',
-        ]*/);
+        $twig = new \Twig\Environment(
+            $loader,
+            /*[
+                'cache' => __DIR__ . '/../../cache',
+            ]*/
+        );
 
-        $function = new \Twig\TwigFilter('to_bytes',
-            fn ($value) => Resultset::formatBytes($value)
+        $function = new \Twig\TwigFilter(
+            'to_bytes',
+            fn($value) => Resultset::formatBytes($value),
         );
         $twig->addFilter($function);
         $function = new \Twig\TwigFilter(
             'plan_description',
-            fn ($value) => self::getPlanDescription($value)
+            fn($value) => self::getPlanDescription($value),
         );
         $twig->addFilter($function);
         return $twig;
@@ -83,7 +82,7 @@ class CheckCommand extends Command
 
         $twig = $this->initializeTwig();
 
-        $region = ($spaceId > 1_000_000) ? "US": "EU";
+        $region = ($spaceId > 1_000_000) ? "US" : "EU";
         $client = SbClient::make($region);
 
         $content = $client->space()->spaceId($spaceId)->get();
@@ -116,8 +115,8 @@ class CheckCommand extends Command
                 'traffic' => $traffic,
                 'statistics' => $statistics,
                 'components' => $components->getBlock("components"),
-                'apps' => $apps->getBlock("apps")
-            ])
+                'apps' => $apps->getBlock("apps"),
+            ]),
         );
 
         $template = $twig->load('traffic.md');
@@ -128,8 +127,8 @@ class CheckCommand extends Command
                 'space' => $space,
                 'traffic' => $traffic,
                 'statistics' => $statistics,
-                'components' => $components
-            ])
+                'components' => $components,
+            ]),
         );
 
 
@@ -137,19 +136,20 @@ class CheckCommand extends Command
 
         $appsBlock = $apps->getBlock("apps");
         $hasBackupApp = $appsBlock->where(
-            'slug', 'backups'
+            'slug',
+            'backups',
         )->exists();
         $hasDimensionApp = $appsBlock->where(
             'slug',
-            'locales'
+            'locales',
         )->exists();
         $hasPipelineApp = $appsBlock->where(
             'slug',
-            'branches'
+            'branches',
         )->exists();
         $hasTasksApp = $appsBlock->where(
             'slug',
-            'tasks'
+            'tasks',
         )->exists();
         $folders = $client->stories()
             ->onlyFolder()
@@ -163,9 +163,9 @@ class CheckCommand extends Command
                 'spaceId' => $spaceId,
                 'space' => $space,
                 'folders' => $folders,
-                'branches' => $branches
+                'branches' => $branches,
 
-            ])
+            ]),
         );
 
 
@@ -196,7 +196,7 @@ class CheckCommand extends Command
         ->where("is_root")
         ->where("is_nestable")
         ->count();
-        $numWithPreset= array_sum($components->getBlock("components")->forEach(fn ($element) => count($element["all_presets"]))->toArray());
+        $numWithPreset = array_sum($components->getBlock("components")->forEach(fn($element) => count($element["all_presets"]))->toArray());
         $presets = $client
             ->presets()
             ->spaceId($spaceId)
@@ -213,9 +213,9 @@ class CheckCommand extends Command
                 'numNestable' => $numNestable,
                 'numUniversal' => $numUniversal,
                 'numWithPreset' => $numWithPreset,
-                'numPresets' => $numPresets
+                'numPresets' => $numPresets,
 
-            ])
+            ]),
         );
 
 

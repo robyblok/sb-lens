@@ -2,22 +2,17 @@
 
 namespace StoryblokLens\Commands;
 
-use StoryblokLens\Reporter;
 use StoryblokLens\Resultset;
-
-
 use StoryblokLens\SbClient;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-
-use function StoryblokLens\Termwind\{hint, title, subtitle, hr,  twoColumnItem, twoColumnList};
+use function StoryblokLens\Termwind\{title, subtitle, twoColumnItem};
 
 class SpacesCommand extends Command
 {
-
     protected function configure()
     {
         $this
@@ -59,18 +54,21 @@ class SpacesCommand extends Command
     private function initializeTwig()
     {
         $loader = new \Twig\Loader\FilesystemLoader(__DIR__ . '/../../resources/views');
-        $twig = new \Twig\Environment($loader,
-        /*[
-            'cache' => __DIR__ . '/../../cache',
-        ]*/);
+        $twig = new \Twig\Environment(
+            $loader,
+            /*[
+                'cache' => __DIR__ . '/../../cache',
+            ]*/
+        );
 
-        $function = new \Twig\TwigFilter('to_bytes',
-            fn ($value) => Resultset::formatBytes($value)
+        $function = new \Twig\TwigFilter(
+            'to_bytes',
+            fn($value) => Resultset::formatBytes($value),
         );
         $twig->addFilter($function);
         $function = new \Twig\TwigFilter(
             'plan_description',
-            fn ($value) => self::getPlanDescription($value)
+            fn($value) => self::getPlanDescription($value),
         );
         $twig->addFilter($function);
         return $twig;
