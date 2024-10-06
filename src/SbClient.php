@@ -38,10 +38,11 @@ class SbClient
 
         $this->personalAccessToken = $_ENV["STORYBLOK_OAUTH_TOKEN"];
 
-        //$this->spaceAccesToken = $_ENV["STORYBLOK_ACCESS_TOKEN"];
-
         $baseUri = match ($region) {
             "US" => "https://api-us.storyblok.com",
+            "CA" => "https://api-ca.storyblok.com",
+            "AP" => "https://api-ap.storyblok.com",
+            "CN" => "https://app.storyblokchina.cn",
             default => "https://mapi.storyblok.com",
         };
 

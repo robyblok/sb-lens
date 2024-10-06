@@ -4,6 +4,7 @@
 use StoryblokLens\Commands\CheckCommand;
 use StoryblokLens\Commands\CheckFrontendCommand;
 use StoryblokLens\Commands\InspectCommand;
+use StoryblokLens\Commands\SpacesCommand;
 use Symfony\Component\Console\Application;
 
 if (file_exists(__DIR__.'/../../autoload.php')) {
@@ -22,4 +23,5 @@ $app = new Application('Sb Lens', '1.0.x');
 $app->add(new InspectCommand());
 $app->add(new CheckCommand());
 $app->add(new CheckFrontendCommand());
+$app->add(new SpacesCommand());
 $app->run();
