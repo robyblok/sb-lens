@@ -10,7 +10,7 @@ use StoryblokLens\Endpoints\Components;
 use StoryblokLens\Endpoints\Presets;
 use StoryblokLens\Endpoints\Space;
 use StoryblokLens\Endpoints\Statistics;
-use StoryblokLens\Endpoints\Traffic;
+use StoryblokLens\Endpoints\Statistics\Traffic;
 use StoryblokLens\Endpoints\Stories;
 use StoryblokLens\Endpoints\Story;
 use StoryblokLens\Endpoints\Workflows;
@@ -24,24 +24,30 @@ class SbClient
 
     private $personalAccessToken = "";
 
-    public static function make(): self
+    public static function make($region = "EU"): self
     {
         $client = new self();
-        $client->init();
+        $client->init($region);
         return $client;
     }
 
-    public function init(): void
+    public function init($region = "EU"): void
     {
         $dotenv = Dotenv::createImmutable(__DIR__ . '/..');
         $dotenv->load();
 
         $this->personalAccessToken = $_ENV["STORYBLOK_OAUTH_TOKEN"];
+
         //$this->spaceAccesToken = $_ENV["STORYBLOK_ACCESS_TOKEN"];
+
+        $baseUri = match ($region) {
+            "US" => "https://api-us.storyblok.com",
+            default => "https://mapi.storyblok.com",
+        };
 
         $this->clientMapi = HttpClient::create()
             ->withOptions([
-                'base_uri' => 'https://mapi.storyblok.com',
+                'base_uri' => $baseUri,
                 'headers' =>
                     [
                         'Accept' => 'application/json',

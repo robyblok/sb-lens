@@ -16,6 +16,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class CheckCommand extends Command
 {
+
     protected function configure()
     {
         $this
@@ -32,12 +33,12 @@ class CheckCommand extends Command
             ->setDescription('Check the Storyblok space usage.');
     }
 
-    private function getPlanDescription($planLevel): string
+    public static function getPlanDescription($planLevel): string
     {
         return match ($planLevel) {
             0 => 'Starter (Trial)',
-            2 => 'Enterprise (Trial)',
-            1 => 'Premium (Trial)',
+            2 => 'Pro Space',
+            1 => 'Standard Space',
             1000 => 'Development',
             100 => 'Community',
             200 => 'Entry',
@@ -45,31 +46,57 @@ class CheckCommand extends Command
             301 => 'Business',
             400 => 'Enterprise',
             500 => 'Enterprise Plus',
+            501 => 'Enterprise Essentials',
+            502 => 'Enterprise Scale',
+            503 => 'Enterprise Ultimate',
+
             default => $planLevel,
         };
 
     }
 
+    private function initializeTwig()
+    {
+        $loader = new \Twig\Loader\FilesystemLoader(__DIR__ . '/../../resources/views');
+        $twig = new \Twig\Environment($loader,
+        /*[
+            'cache' => __DIR__ . '/../../cache',
+        ]*/);
+
+        $function = new \Twig\TwigFilter('to_bytes',
+            fn ($value) => Resultset::formatBytes($value)
+        );
+        $twig->addFilter($function);
+        $function = new \Twig\TwigFilter(
+            'plan_description',
+            fn ($value) => self::getPlanDescription($value)
+        );
+        $twig->addFilter($function);
+        return $twig;
+
+    }
+
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+
         $spaceId = $input->getOption("space");
-        $r = new Reporter();
 
-        $r->title('Storyblok Lens - Check Space ' . $spaceId);
+        $twig = $this->initializeTwig();
 
-        $client = SbClient::make();
+        $region = ($spaceId > 1_000_000) ? "US": "EU";
+        $client = SbClient::make($region);
 
         $content = $client->space()->spaceId($spaceId)->get();
+
         file_put_contents(
-            "./space_" . $spaceId . ".json",
-            json_encode($content, JSON_PRETTY_PRINT),
+            "./space_" . $spaceId . "-" . time() . ".json",
+            $content->toJson(),
         );
-        $space = $content["space"];
+        $space = $content->getBlock("space");
         $statistics = $client
             ->statistics()
             ->spaceId($spaceId)
             ->get();
-        var_dump($statistics);
         $traffic = $client
             ->traffic()
             ->spaceId($spaceId)
@@ -78,155 +105,122 @@ class CheckCommand extends Command
             ->components()
             ->spaceId($spaceId)
             ->get();
-
-        $r->title(sprintf('Checking Space (%s): %s', $spaceId, $space['name']), 2);
-        $r->liLabelValue("Plan", $this->getPlanDescription($space['plan_level']));
-        $r->liLabelValue("Traffic usage (this month)", Resultset::formatBytes($traffic['traffic_used_this_month']));
-        $r->liLabelValue("Traffic usage (last 5 days)", Resultset::formatBytes($traffic['total_traffic_per_time_period']));
-        $r->liLabelValue("API Requests (last 5 days)", $traffic['total_requests_per_time_period']);
-        $r->liLabelValue("API Server Location", $space['region']);
-        $r->liLabelValue("Stories", $space['stories_count']);
-        $r->liLabelValue("Assets", $space['assets_count']);
-        $r->liLabelValue("Blocks/Components", $components->count());
-        $r->liLabelValue("Users", $statistics->get("collaborators_count", "N/A"));
-        $r->liLabelValue("Max Users", $statistics->get("collaborators_limit", "N/A"));
-        $r->newLine();
-
-        $r->title("Traffic usage (monthly)");
-
-        $r->tableHeader(["Month", "Requests", "Traffic"]);
-        foreach ($statistics["monthly_traffic"] as $statistic) {
-            $r->tableRow(
-                [
-                    $statistic["month_col"],
-                    $statistic["counting"] . " reqs.",
-                    Resultset::formatBytes($statistic["total_bytes"]),
-                ],
-            );
-
-        }
-
-        $r->newLine();
-        $r->title("Installed applications");
-
-
         $apps = $client->apps()->spaceId($spaceId)->get();
-        $hasDimensionApp = false;
-        $hasPipelineApp = false;
-        $hasBackupApp = false;
-        $hasTaskApp = false;
-        $r->paragraph(sprintf('The Space %s has ', $spaceId) . count($apps["apps"]) . " installed applications.");
-        $r->paragraph("The installed applications are:");
-        foreach ($apps["apps"] as $app) {
-            if ($app['slug'] === 'backups') {
-                $hasBackupApp = true;
-            }
 
-            if ($app['slug'] === 'tasks') {
-                $hasTaskApp = true;
-            }
+        $template = $twig->load('overview.md');
 
-            if ($app['slug'] === 'locales') {
-                $hasDimensionApp = true;
-            }
+        $output->write(
+            $template->render([
+                'spaceId' => $spaceId,
+                'space' => $space,
+                'traffic' => $traffic,
+                'statistics' => $statistics,
+                'components' => $components->getBlock("components"),
+                'apps' => $apps->getBlock("apps")
+            ])
+        );
 
-            if ($app['slug'] === 'branches') {
-                $hasPipelineApp = true;
-            }
+        $template = $twig->load('traffic.md');
+        $output->writeln("");
+        $output->write(
+            $template->render([
+                'spaceId' => $spaceId,
+                'space' => $space,
+                'traffic' => $traffic,
+                'statistics' => $statistics,
+                'components' => $components
+            ])
+        );
 
-            $r->li(sprintf('%s (%s)', $app['name'], $app['slug']));
 
-        }
+        $branches = $client->branches()->spaceId($spaceId)->get();
 
-        $r->newLine();
-
-        $r->title('Project Structure');
-        $r->title("Applications for managing the Space's Structure", 3);
-
-        if ($hasDimensionApp) {
-            $r->paragraph('The first level folder structure is managed via Dimension Application');
-        } else {
-            $r->paragraph('Dimension Application not installed.');
-        }
-
-        if ($hasPipelineApp) {
-            $r->paragraph('Using Pipeline app with:');
-            $branches = $client->branches()->spaceId($spaceId)->get();
-            foreach ($branches["branches"] as $branch) {
-                $r->li($branch['name']);
-            }
-        } else {
-            $r->paragraph('Pipeline App is NOT used.');
-        }
-
-        $r->title('First level folders');
-
-        $folders = $client->stories()->spaceId($spaceId)
+        $appsBlock = $apps->getBlock("apps");
+        $hasBackupApp = $appsBlock->where(
+            'slug', 'backups'
+        )->exists();
+        $hasDimensionApp = $appsBlock->where(
+            'slug',
+            'locales'
+        )->exists();
+        $hasPipelineApp = $appsBlock->where(
+            'slug',
+            'branches'
+        )->exists();
+        $hasTasksApp = $appsBlock->where(
+            'slug',
+            'tasks'
+        )->exists();
+        $folders = $client->stories()
             ->onlyFolder()
-            ->parentId(0)->get();
+            ->parentId(0)
+            ->spaceId($spaceId)
+            ->get();
+        $template = $twig->load('project-structure.md');
+        $output->writeln("");
+        $output->write(
+            $template->render([
+                'spaceId' => $spaceId,
+                'space' => $space,
+                'folders' => $folders,
+                'branches' => $branches
 
-        $r->paragraph('First level folders:');
-        foreach ($folders["stories"] as $folder) {
-            $r->li(sprintf('%s ( %s )', $folder['name'], $folder['slug']));
-        }
+            ])
+        );
 
-        $r->newLine();
 
-        $r->title('Block Library usage');
+
+
+
+
 
         $components = $client
             ->components()
             ->spaceId($spaceId)
             ->get();
 
+
         $numContentTypes = 0;
         $numNestable = 0;
         $numUniversal = 0;
         $numWithPreset = 0;
-        foreach ($components["components"] as $component) {
-            $string = "";
-            if ($component["is_root"] && $component["is_nestable"]) {
-                $string = "Universal Block";
-                ++$numUniversal;
-            } else {
-                if ($component["is_root"]) {
-                    $string = "Content Type";
-                    ++$numContentTypes;
-                }
-
-                if ($component["is_nestable"]) {
-                    $string = "Nestable";
-                    ++$numNestable;
-                }
-            }
-
-            if ($string === "") {
-                $string = "Nestable";
-                ++$numNestable;
-            }
-
-            $string = $string . " with " . count($component["all_presets"]) . " presets";
-            if (count($component["all_presets"]) > 0) {
-                ++$numWithPreset;
-            }
-
-        }
-
-        $r->paragraph('Component usage, how many content types, nestable components etc: ');
-        $r->liLabelValue("Content Types", $numContentTypes);
-        $r->liLabelValue("Universal", $numUniversal);
-        $r->liLabelValue("Nested Block", $numNestable);
-        $r->liLabelValue("Component with presets", $numWithPreset);
-
+        $numContentTypes = $components->getBlock("components")
+            ->where("is_root")
+            ->where("is_nestable", false)
+        ->count();
+        $numNestable = $components->getBlock("components")
+        ->where("is_root", false)
+        ->where("is_nestable")
+        ->count();
+        $numUniversal = $components->getBlock("components")
+        ->where("is_root")
+        ->where("is_nestable")
+        ->count();
+        $numWithPreset= array_sum($components->getBlock("components")->forEach(fn ($element) => count($element["all_presets"]))->toArray());
         $presets = $client
             ->presets()
             ->spaceId($spaceId)
             ->get();
+        $numPresets = $presets->getBlock("presets")->count();
+        $template = $twig->load('block-library.md');
+        $output->writeln("");
+        $output->write(
+            $template->render([
+                'spaceId' => $spaceId,
+                'space' => $space,
+                'components' => $components,
+                'numContentTypes' => $numContentTypes,
+                'numNestable' => $numNestable,
+                'numUniversal' => $numUniversal,
+                'numWithPreset' => $numWithPreset,
+                'numPresets' => $numPresets
 
-        $r->liLabelValue("Total presets", count($presets["presets"]));
+            ])
+        );
 
 
-        $output->write($r->getString());
+
+        //$output->write($r->getString());
 
         //View::make('report', ['name' => 'James']);
 

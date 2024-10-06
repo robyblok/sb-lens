@@ -24,13 +24,11 @@ abstract class EndpointBase
 
     public function getResponse()
     {
-
         return $this->clientMapi->request(
             $this->method(),
             $this->endpoint(),
             $this->options(),
         );
-
     }
 
     public function get(): Block

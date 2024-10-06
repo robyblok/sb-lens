@@ -8,7 +8,7 @@ composer.phar
 
 
 .env
-
+/cache/
 /.idea/
 /space_*.json
 /test.*

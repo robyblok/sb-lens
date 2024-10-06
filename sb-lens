@@ -2,6 +2,7 @@
 <?php
 
 use StoryblokLens\Commands\CheckCommand;
+use StoryblokLens\Commands\CheckFrontendCommand;
 use StoryblokLens\Commands\InspectCommand;
 use Symfony\Component\Console\Application;
 
@@ -20,4 +21,5 @@ $app = new Application('Sb Lens', '1.0.x');
 
 $app->add(new InspectCommand());
 $app->add(new CheckCommand());
+$app->add(new CheckFrontendCommand());
 $app->run();

@@ -53,8 +53,8 @@ class InspectCommand extends Command
         $skipUrl = $input->getOption("skip-url");
 
         title("Storyblok Lens");
-
-        $client = SbClient::make();
+        $region = ($spaceId > 1_000_000) ? "US" : "EU";
+        $client = SbClient::make($region);
 
 
         $content = $client->space()->spaceId($spaceId)->get();
@@ -240,7 +240,9 @@ class InspectCommand extends Command
             ->get();
         subtitle("Stories without workflow for space id: " . $spaceId);
         //var_dump($response->getHeaders()["total"][0]);
+
         foreach ($stories["stories"] as $item) {
+            var_dump($item);
             $prefix = $item["is_folder"] ? "F" : "S";
             $stage = is_null($item["stage"]) ? "NO STAGE WORKFLOW" : $availableWorkflows[$item["stage"]["workflow_stage_id"]];
 

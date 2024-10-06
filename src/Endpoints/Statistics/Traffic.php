@@ -1,8 +1,8 @@
 <?php
 
-namespace StoryblokLens\Endpoints;
+namespace StoryblokLens\Endpoints\Statistics;
 
-class Traffic extends EndpointBase
+class Traffic extends \StoryblokLens\Endpoints\EndpointBase
 {
     protected function endpoint(): string
     {
