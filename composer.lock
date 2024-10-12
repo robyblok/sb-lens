@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c454f83c71a28ba2ef2c2d52d7fc78b2",
+    "content-hash": "2ab6a05789409b8761c18c53879671c9",
     "packages": [
         {
             "name": "graham-campbell/result-type",
@@ -70,16 +70,16 @@
         },
         {
             "name": "hi-folks/data-block",
-            "version": "v0.3.9",
+            "version": "v0.4.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Hi-Folks/data-block.git",
-                "reference": "7bcdb06212260397ff6adfe7829391543802ef10"
+                "reference": "31d05054eaeec3e05a82ad366c4ee3546a5ffa4e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Hi-Folks/data-block/zipball/7bcdb06212260397ff6adfe7829391543802ef10",
-                "reference": "7bcdb06212260397ff6adfe7829391543802ef10",
+                "url": "https://api.github.com/repos/Hi-Folks/data-block/zipball/31d05054eaeec3e05a82ad366c4ee3546a5ffa4e",
+                "reference": "31d05054eaeec3e05a82ad366c4ee3546a5ffa4e",
                 "shasum": ""
             },
             "require": {
@@ -121,9 +121,9 @@
             ],
             "support": {
                 "issues": "https://github.com/Hi-Folks/data-block/issues",
-                "source": "https://github.com/Hi-Folks/data-block/tree/v0.3.9"
+                "source": "https://github.com/Hi-Folks/data-block/tree/v0.4.1"
             },
-            "time": "2024-08-08T20:07:14+00:00"
+            "time": "2024-10-11T21:11:40+00:00"
         },
         {
             "name": "nunomaduro/termwind",

@@ -33,14 +33,14 @@ class CheckFrontendCommand extends Command
             ->setDescription('Check the frontend URL and provides some suggestion to improve the Storyblok configuration.');
     }
 
-    private static function sanitize_url($url)
+    private function sanitize_url($url): string
     {
         // Replace all characters that are not alphanumeric or hyphens with underscores
-        $sanitized_url = preg_replace('/[^a-zA-Z0-9-]/', '_', $url);
+        $sanitized_url = preg_replace('/[^a-zA-Z0-9-]/', '_', (string) $url);
         // Remove the initial https___ (or http___ if necessary)
-        $sanitized_url = preg_replace('/^https___/', '', $sanitized_url);
+        $sanitized_url = preg_replace('/^https___/', '', (string) $sanitized_url);
         // Remove trailing underscores
-        $sanitized_url = rtrim($sanitized_url, '_');
+        $sanitized_url = rtrim((string) $sanitized_url, '_');
         return $sanitized_url;
     }
 
@@ -56,7 +56,7 @@ class CheckFrontendCommand extends Command
 
         $urlToAnalyze = $input->getArgument("url");
         $skipCheck = $input->getOption("skip-check");
-        $urlSlug = self::sanitize_url($urlToAnalyze);
+        $urlSlug = $this->sanitize_url($urlToAnalyze);
 
         if (! $skipCheck) {
             $process = new Process([
@@ -75,6 +75,7 @@ class CheckFrontendCommand extends Command
             }
 
         }
+
         $directory = __DIR__ . "/../../resources/views/hints";
         $fileNames = [];
 
@@ -85,13 +86,14 @@ class CheckFrontendCommand extends Command
                 // Loop through the directory contents
                 while (false !== ($file = readdir($handle))) {
                     // Skip the current and parent directory entries
-                    if ($file != '.' && $file != '..') {
+                    if ($file !== '.' && $file !== '..') {
                         // Get the file name without the extension
                         $fileName = pathinfo($file, PATHINFO_FILENAME);
                         // Add the file name to the array
                         $fileNames[] = $fileName;
                     }
                 }
+
                 // Close the directory handle
                 closedir($handle);
             }

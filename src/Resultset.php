@@ -89,7 +89,9 @@ class Resultset
     }
 
 
-
+    /**
+     * @deprecated use SbLensUtils::formatBytes()
+     */
     public static function formatBytes(string|null $bytes, $precision = 2): string
     {
         if (is_null($bytes)) {

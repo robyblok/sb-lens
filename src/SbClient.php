@@ -7,48 +7,62 @@ use StoryblokLens\Endpoints\Apps;
 use StoryblokLens\Endpoints\Branches;
 use StoryblokLens\Endpoints\Cdn\CdnStories;
 use StoryblokLens\Endpoints\Components;
+use StoryblokLens\Endpoints\Me;
 use StoryblokLens\Endpoints\Presets;
 use StoryblokLens\Endpoints\Space;
 use StoryblokLens\Endpoints\Statistics;
+use StoryblokLens\Endpoints\Statistics\AssetsTraffic;
 use StoryblokLens\Endpoints\Statistics\Traffic;
 use StoryblokLens\Endpoints\Stories;
 use StoryblokLens\Endpoints\Story;
 use StoryblokLens\Endpoints\Workflows;
+use StoryblokLens\Traits\StoryblokTrait;
 use Symfony\Component\HttpClient\HttpClient;
 
 class SbClient
 {
+    use StoryblokTrait;
+
     private ?\Symfony\Contracts\HttpClient\HttpClientInterface $clientMapi = null;
+
+    private ?\Symfony\Contracts\HttpClient\HttpClientInterface $clientOauth = null;
+
 
     private ?\Symfony\Contracts\HttpClient\HttpClientInterface $clientCdn = null;
 
     private $personalAccessToken = "";
 
-    public static function make($region = "EU"): self
+    public static function make(string $region = "EU"): self
     {
         $client = new self();
         $client->init($region);
         return $client;
     }
 
-    public function init($region = "EU"): void
+    public function init(string $region = "EU"): void
     {
         $dotenv = Dotenv::createImmutable(__DIR__ . '/..');
         $dotenv->load();
 
         $this->personalAccessToken = $_ENV["STORYBLOK_OAUTH_TOKEN"];
 
-        $baseUri = match ($region) {
-            "US" => "https://api-us.storyblok.com",
-            "CA" => "https://api-ca.storyblok.com",
-            "AP" => "https://api-ap.storyblok.com",
-            "CN" => "https://app.storyblokchina.cn",
-            default => "https://mapi.storyblok.com",
-        };
+        $baseUriMapi = $this->baseUriFromRegionForMapi($region);
 
         $this->clientMapi = HttpClient::create()
             ->withOptions([
-                'base_uri' => $baseUri,
+                'base_uri' => $baseUriMapi,
+                'headers' =>
+                    [
+                        'Accept' => 'application/json',
+                        'Content-Type' => 'application/json',
+                        'Authorization' => $this->personalAccessToken,
+                    ],
+            ]);
+
+        $baseUriOauth = $this->baseUriFromRegionForOauth($region);
+        $this->clientOauth = HttpClient::create()
+            ->withOptions([
+                'base_uri' => $baseUriOauth,
                 'headers' =>
                     [
                         'Accept' => 'application/json',
@@ -104,6 +118,11 @@ class SbClient
         return new Traffic($this->clientMapi);
     }
 
+    public function assetsTraffic(): AssetsTraffic
+    {
+        return new AssetsTraffic($this->clientMapi);
+    }
+
     public function presets(): Presets
     {
         return new Presets($this->clientMapi);
@@ -127,6 +146,11 @@ class SbClient
     public function branches(): Branches
     {
         return new Branches($this->clientMapi);
+    }
+
+    public function me(): Me
+    {
+        return new Me($this->clientMapi);
     }
 
     public function cdnStories(): CdnStories

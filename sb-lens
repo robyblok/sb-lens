@@ -5,6 +5,8 @@ use StoryblokLens\Commands\CheckCommand;
 use StoryblokLens\Commands\CheckFrontendCommand;
 use StoryblokLens\Commands\InspectCommand;
 use StoryblokLens\Commands\SpacesCommand;
+use StoryblokLens\Commands\StatsCommand;
+use StoryblokLens\Commands\WhoAmICommand;
 use Symfony\Component\Console\Application;
 
 if (file_exists(__DIR__.'/../../autoload.php')) {
@@ -24,4 +26,6 @@ $app->add(new InspectCommand());
 $app->add(new CheckCommand());
 $app->add(new CheckFrontendCommand());
 $app->add(new SpacesCommand());
+$app->add(new WhoAmICommand());
+$app->add(new StatsCommand());
 $app->run();
