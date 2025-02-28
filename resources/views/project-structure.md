@@ -2,7 +2,7 @@
 
 ### Applications for managing the Space's Structure
 
-Storyblok provides some application for managing the structure of the Space.
+Storyblok provides some applications for managing the structure of the Space.
 
 #### The Dimension Application
 

@@ -51,7 +51,13 @@ Limits:
 | Month | Requests | Traffic |
 | ----- | -------- | ------- |
 {% for statistic in statistics.getBlock("api_logs_per_month").orderBy("created_at", "desc") %}
-| {{ statistic.getFormattedDateTime("created_at", "dS F Y") }} | {{ statistic["counting"] }} reqs. | {{ statistic["total_bytes"]|to_bytes }} |
+| {{
+    statistic.getFormattedDateTime("created_at", "dS F Y")
+}} | {{
+    statistic.get("counting")
+}} reqs. | {{
+    statistic.getFormattedByte("total_bytes")
+}} |
 {% endfor %}
 
 ## API logs

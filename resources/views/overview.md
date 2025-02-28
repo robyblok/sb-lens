@@ -37,6 +37,7 @@
 
 {% if (space.getBlock("options.languages").count() > 0 ) %}
 Here the list of defined languages ({{ space.getBlock("options.languages").count() }})
+
 | Lang Code | Language |
 | ----- | -------- |
 {% for lang in space.getBlock("options.languages") %}
