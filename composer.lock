@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "2ab6a05789409b8761c18c53879671c9",
+    "content-hash": "4617a53eca0e929694e0ffe7a3154eb4",
     "packages": [
         {
             "name": "graham-campbell/result-type",
@@ -70,16 +70,16 @@
         },
         {
             "name": "hi-folks/data-block",
-            "version": "v0.4.1",
+            "version": "v0.4.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Hi-Folks/data-block.git",
-                "reference": "31d05054eaeec3e05a82ad366c4ee3546a5ffa4e"
+                "reference": "30f196caa0e47ef69116a7ba234733739692f5b0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Hi-Folks/data-block/zipball/31d05054eaeec3e05a82ad366c4ee3546a5ffa4e",
-                "reference": "31d05054eaeec3e05a82ad366c4ee3546a5ffa4e",
+                "url": "https://api.github.com/repos/Hi-Folks/data-block/zipball/30f196caa0e47ef69116a7ba234733739692f5b0",
+                "reference": "30f196caa0e47ef69116a7ba234733739692f5b0",
                 "shasum": ""
             },
             "require": {
@@ -121,9 +121,9 @@
             ],
             "support": {
                 "issues": "https://github.com/Hi-Folks/data-block/issues",
-                "source": "https://github.com/Hi-Folks/data-block/tree/v0.4.1"
+                "source": "https://github.com/Hi-Folks/data-block/tree/v0.4.2"
             },
-            "time": "2024-10-11T21:11:40+00:00"
+            "time": "2024-10-15T17:46:06+00:00"
         },
         {
             "name": "nunomaduro/termwind",
@@ -1992,12 +1992,12 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {},
+    "stability-flags": [],
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
         "php": "^8.2"
     },
-    "platform-dev": {},
+    "platform-dev": [],
     "plugin-api-version": "2.6.0"
 }
