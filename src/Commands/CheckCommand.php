@@ -119,6 +119,8 @@ class CheckCommand extends BaseStoryblokCommand
                 'space' => $space,
                 'folders' => $folders,
                 'branches' => $branches,
+                'hasPipelineApp' => $apps->getBlock("apps")->where("slug", "branches")->count()>0,
+                'hasDimensionApp' => $apps->getBlock("apps")->where("slug", "locales")->count()>0
 
             ]),
         );
