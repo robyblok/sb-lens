@@ -32,11 +32,17 @@ class Resultset
 
     }
 
-    public function add($field, $function = false): static
+    public function add($field, callable|false $function = false): static
     {
         $value = "";
-        if (array_key_exists($field, $this->data)) {
-            $value = $this->data[$field];
+        $data = [];
+        if ($this->data instanceof \HiFolks\DataType\Block) {
+            $data = $this->data->toArray();
+        } else {
+            $data = $this->data;
+        }
+        if (array_key_exists($field, $data)) {
+            $value = $data[$field];
             if ($function) {
                 $value = forward_static_call($function, $value);
             }
